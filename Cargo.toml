@@ -22,3 +22,4 @@ path = "src/lib.rs"
 clap = { version = "3.2.16", features = ["derive"] }
 clap_complete = "3.2.3"
 thiserror = "1.0.32"
+pipe-trait = "0.4.0"
