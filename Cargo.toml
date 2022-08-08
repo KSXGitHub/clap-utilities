@@ -1,0 +1,24 @@
+[package]
+name = "clap-utilities"
+description = "Small utilities related to clap"
+version = "0.0.0"
+edition = "2021"
+authors = ["khai96_ <hvksmr1996@gmail.com>"]
+keywords = ["clap"]
+repository = "https://github.com/KSXGitHub/clap-utilities.git"
+readme = "README.md"
+include = [
+  "/src",
+  "/Cargo.toml",
+  "/README.md",
+]
+license = "MIT"
+
+[lib]
+name = "clap_utilities"
+path = "src/lib.rs"
+
+[dependencies]
+clap = { version = "3.2.16", features = ["derive"] }
+clap_complete = "3.2.3"
+thiserror = "1.0.32"
