@@ -20,6 +20,6 @@ path = "src/lib.rs"
 
 [dependencies]
 clap = { version = "4.0.26", features = ["derive"] }
-clap_complete = "4.0.5"
+clap_complete = "4.0.6"
 thiserror = "1.0.38"
 pipe-trait = "0.4.0"
