@@ -22,10 +22,10 @@ pub struct CompletionGenerator {
     output: PathBuf,
 }
 
-/// Error caused by filesystem operation.
+/// Error caused by failure to create a file.
 #[derive(Debug, Display, Error)]
-#[display("{}: {error}", path.to_string_lossy())]
-pub struct FileSystemError {
+#[display("Failed to create file {}: {error}", path.to_string_lossy())]
+pub struct CreateFileError {
     /// Path in question.
     #[error(not(source))]
     path: PathBuf,
@@ -34,7 +34,7 @@ pub struct FileSystemError {
     error: io::Error,
 }
 
-impl FileSystemError {
+impl CreateFileError {
     /// Create the error.
     fn new(path: PathBuf, error: io::Error) -> Self {
         Self { path, error }
@@ -55,8 +55,8 @@ impl FileSystemError {
 #[derive(Debug, Display, Error)]
 #[non_exhaustive]
 pub enum Error {
-    /// Error caused by filesystem operation.
-    FileSystem(FileSystemError),
+    /// Failed to create a file.
+    CreateFile(CreateFileError),
 }
 
 impl CompletionGenerator {
@@ -70,7 +70,7 @@ impl CompletionGenerator {
         let mut cmd = App::command();
         let mut output_file = match File::create(&output) {
             Ok(output_file) => output_file,
-            Err(error) => return Err(Error::FileSystem(FileSystemError::new(output, error))),
+            Err(error) => return Err(Error::CreateFile(CreateFileError::new(output, error))),
         };
         generate(shell, &mut cmd, name, &mut output_file);
         Ok(())
