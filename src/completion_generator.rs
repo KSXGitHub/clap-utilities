@@ -1,7 +1,12 @@
 use clap::{CommandFactory, Parser};
 use clap_complete::{generate, Shell};
 use derive_more::{Display, Error};
-use std::{fs::File, io, path::PathBuf, process::ExitCode};
+use std::{
+    fs::File,
+    io,
+    path::{Path, PathBuf},
+    process::ExitCode,
+};
 
 /// Generate completions.
 #[derive(Debug, Parser)]
@@ -17,19 +22,41 @@ pub struct CompletionGenerator {
     output: PathBuf,
 }
 
+/// Error caused by filesystem operation.
+#[derive(Debug, Display, Error)]
+#[display("{}: {error}", path.to_string_lossy())]
+pub struct FileSystemError {
+    /// Path in question.
+    #[error(not(source))]
+    path: PathBuf,
+    /// Emitted error.
+    #[error(source)]
+    error: io::Error,
+}
+
+impl FileSystemError {
+    /// Create the error.
+    fn new(path: PathBuf, error: io::Error) -> Self {
+        Self { path, error }
+    }
+
+    /// Get the path that caused the error.
+    pub fn path(&self) -> &Path {
+        &self.path
+    }
+
+    /// Get the source of the error.
+    pub fn source(&self) -> &io::Error {
+        &self.error
+    }
+}
+
 /// Error of the generator.
 #[derive(Debug, Display, Error)]
+#[non_exhaustive]
 pub enum Error {
     /// Error caused by filesystem operation.
-    #[display("{}: {error}", path.to_string_lossy())]
-    FileSystem {
-        /// Path in question.
-        #[error(not(source))]
-        path: PathBuf,
-        /// Emitted error.
-        #[error(source)]
-        error: io::Error,
-    },
+    FileSystem(FileSystemError),
 }
 
 impl CompletionGenerator {
@@ -43,12 +70,7 @@ impl CompletionGenerator {
         let mut cmd = App::command();
         let mut output_file = match File::create(&output) {
             Ok(output_file) => output_file,
-            Err(error) => {
-                return Err(Error::FileSystem {
-                    path: output,
-                    error,
-                })
-            }
+            Err(error) => return Err(Error::FileSystem(FileSystemError::new(output, error))),
         };
         generate(shell, &mut cmd, name, &mut output_file);
         Ok(())
