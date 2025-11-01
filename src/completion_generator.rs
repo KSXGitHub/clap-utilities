@@ -1,7 +1,7 @@
 use clap::{CommandFactory, Parser};
 use clap_complete::{generate, Shell};
+use derive_more::{Display, Error};
 use std::{fs::File, io, path::PathBuf, process::ExitCode};
-use thiserror::Error;
 
 /// Generate completions.
 #[derive(Debug, Parser)]
@@ -18,15 +18,16 @@ pub struct CompletionGenerator {
 }
 
 /// Error of the generator.
-#[derive(Debug, Error)]
+#[derive(Debug, Display, Error)]
 pub enum Error {
     /// Error caused by filesystem operation.
-    #[error("{}: {error}", path.to_string_lossy())]
+    #[display("{}: {error}", path.to_string_lossy())]
     FileSystem {
         /// Path in question.
+        #[error(not(source))]
         path: PathBuf,
         /// Emitted error.
-        #[source]
+        #[error(source)]
         error: io::Error,
     },
 }
