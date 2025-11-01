@@ -41,10 +41,15 @@ impl CompletionGenerator {
             output,
         } = self;
         let mut cmd = App::command();
-        let mut output_file = File::create(&output).map_err(|error| Error::FileSystem {
-            path: output.clone(),
-            error,
-        })?;
+        let mut output_file = match File::create(&output) {
+            Ok(output_file) => output_file,
+            Err(error) => {
+                return Err(Error::FileSystem {
+                    path: output,
+                    error,
+                })
+            }
+        };
         generate(shell, &mut cmd, name, &mut output_file);
         Ok(())
     }
