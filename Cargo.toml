@@ -13,6 +13,7 @@ include = [
   "/README.md",
 ]
 license = "MIT"
+rust-version = "1.89.0"
 
 [lib]
 name = "clap_utilities"
@@ -23,3 +24,6 @@ clap = { version = "4.1.13", features = ["derive"] }
 clap_complete = "4.2.0"
 derive_more = { version = "2.0.1", features = ["display", "error"] }
 pipe-trait = "0.4.0"
+
+[dev-dependencies]
+cargo_toml = "0.22.3"
